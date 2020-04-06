@@ -2,11 +2,12 @@ import torch
 import torch.nn as nn
 import time
 import copy
+from model import create_net
 
 class Trainer:
     def __init__(self, dataloaders, mlp_width=None, mode='oo', learning_rate=1e-3,
                  weight_decay=1e-2, pretrained_file=None,
-                 optimizer_type=None, version=None, **kwargs):
+                 optimizer_type=None, version=None,  use_cuda=True, **kwargs):
 
         # Dataset
         self.dataloaders = dataloaders
@@ -31,11 +32,12 @@ class Trainer:
         self.num_epochs_trained = 0
         self.best_acc = 0.0
         self.grad_norms = []
+        self.use_cuda = use_cuda
 
         # Version
         self.version = version
 
-    def train_model(self, num_epochs=25, eval_only=False):
+    def train(self, num_epochs=25, eval_only=False):
         """
         Function taken from Pytorch documentation, has lots of nice functionality in it.
         But I didn't write this so it has a lot.
@@ -61,7 +63,7 @@ class Trainer:
 
                 # Iterate over data.
                 for i, (inputs, labels) in enumerate(self.dataloaders[phase]):
-                    if use_cuda and torch.cuda.is_available():
+                    if self.use_cuda and torch.cuda.is_available():
                         inputs = inputs.cuda()
                         labels = labels.cuda()
 
