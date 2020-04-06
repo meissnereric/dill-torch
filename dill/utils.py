@@ -1,3 +1,8 @@
+import torch
+import torch.nn as nn
+import torch.nn.init as init
+import numpy as np
+
 def normal_init(m):
     if isinstance(m, nn.Linear):
         normal_(m.weight.data, mean=0.0, std=0.1)

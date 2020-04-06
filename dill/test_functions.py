@@ -1,17 +1,10 @@
 import torch
 import torch.nn as nn
-
-test_tensor = torch.Tensor([[0.1],[1]])
+import numpy as np
+from .viz import plot_outputs
+from .simple_model import create_model, init_const_model
 
 # What is the output at layer 1
-def plot_outputs(outputs):
-    print('***************************************')
-    print(outputs)
-    for sample in outputs:
-        sample = sample.detach().numpy()
-        plt.plot(sample)
-    print('***************************************')
-
 def test_layer_one_outputs(data):
     one_layer = nn.Linear(1, net_width, bias=False)
     init.constant_(one_layer.weight.data, 1)
@@ -30,22 +23,12 @@ def test_layer_two_outputs(data):
 
 
 # What is the final output at layer 3
-def test_layer_three_outputs(data):
-    net = nn.Sequential()
-    net.add_module('basis', nn.Linear(1, net_width, bias=False))
-    # net.add_module('relu', nn.ReLU())
-    net.add_module('rbf', RBF(net_width,net_width,gaussian))
-    net.add_module('weights', nn.Linear(net_width, 1, bias=False))
-
-
-    apply_init(net, 'basis', constant_init)
-    apply_init(net, 'weights', constant_init)
-
-    output = net(data)
-    print('***************************************')
-    print(outputs)
-    plt.plot(output.detach().numpy())
-    print('***************************************')
+def test_full_simple_model(data):
+    net_width = 5
+    net = create_model(net_width)
+    init_const_model(net)
+    outputs = net(data)
+    plot_outputs(outputs, final_layer=True)
 
 def visualize_predictions(net, dataloaders):
     predictions = []

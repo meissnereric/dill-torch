@@ -1,5 +1,9 @@
 # RBF Layer
 
+import torch
+import torch.nn as nn
+import numpy as np
+
 class RBF(nn.Module):
     """
     Transforms incoming data using a given radial basis function:

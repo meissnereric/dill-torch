@@ -2,12 +2,11 @@ import torch
 import torch.nn as nn
 import time
 import copy
-from model import create_net
 
 class Trainer:
-    def __init__(self, dataloaders, mlp_width=None, mode='oo', learning_rate=1e-3,
+    def __init__(self, dataloaders, model, criterion, optimizer, mlp_width=None, mode='oo', learning_rate=1e-3,
                  weight_decay=1e-2, pretrained_file=None,
-                 optimizer_type=None, version=None,  use_cuda=True, **kwargs):
+                 optimizer_type=None, version=None, use_cuda=True, **kwargs):
 
         # Dataset
         self.dataloaders = dataloaders
@@ -20,11 +19,7 @@ class Trainer:
         self.pretrained_file = pretrained_file
         self.optimizer_type = optimizer_type
 
-        self.model, self.criterion, self.optimizer =  create_net(
-            mlp_width=mlp_width,
-            mode=mode, learning_rate=learning_rate,
-            weight_decay=weight_decay, pretrained_file=pretrained_file,
-            optimizer_type=optimizer_type, **kwargs)
+        self.model, self.criterion, self.optimizer =  model, criterion, optimizer
 
         # Stored training metrics
         self.val_acc_history = []
@@ -37,7 +32,7 @@ class Trainer:
         # Version
         self.version = version
 
-    def train(self, num_epochs=25, eval_only=False):
+    def train(self, num_epochs=25, eval_only=False, verbose=True):
         """
         Function taken from Pytorch documentation, has lots of nice functionality in it.
         But I didn't write this so it has a lot.
@@ -45,8 +40,9 @@ class Trainer:
         since = time.time()
 
         for epoch in range(num_epochs):
-            print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-            print('-' * 10)
+            if verbose:
+                print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+                print('-' * 10)
             self.num_epochs_trained = self.num_epochs_trained + 1
 
             # Each epoch has a training and validation phase
@@ -64,8 +60,11 @@ class Trainer:
                 # Iterate over data.
                 for i, (inputs, labels) in enumerate(self.dataloaders[phase]):
                     if self.use_cuda and torch.cuda.is_available():
-                        inputs = inputs.cuda()
-                        labels = labels.cuda()
+                        inputs = inputs.cuda().double()
+                        labels = labels.cuda().double()
+                    if len(inputs.shape) == 1:
+                        inputs = inputs.reshape(inputs.shape[0],1)
+                        labels = labels.reshape(labels.shape[0],1)
 
                     # zero the parameter gradients
                     self.optimizer.zero_grad()
@@ -80,7 +79,7 @@ class Trainer:
                         outputs = self.model(inputs)
                         loss = self.criterion(outputs, labels)
 
-                        _, preds = torch.max(outputs, 1)
+                        preds = outputs
 
                         # loss.register_hook(lambda grad: print(grad))
 
@@ -89,9 +88,10 @@ class Trainer:
                             loss.backward()
                             self.optimizer.step()
 
-                            if (i+1) % 1000 == 0:
-                                print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f'
-                                    %(epoch+1, num_epochs, i+1, len(train_dataset)//batch_size, loss.data))
+                            if verbose:
+                                if (i+1) % 1000 == 0:
+                                    print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f'
+                                        %(epoch+1, num_epochs, i+1, len(train_dataset)//batch_size, loss.data))
 
 
                     # statistics
@@ -102,12 +102,17 @@ class Trainer:
                 epoch_acc = running_corrects.double() / len(self.dataloaders[phase].dataset)
 
                 epoch_time_elapsed = time.time() - epoch_start_time
-                print('Epoch complete in {:.0f}m {:.0f}s'.format(epoch_time_elapsed // 60, epoch_time_elapsed % 60))
-                print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+                if not verbose:
+                    if (epoch+1) % 1000 == 0:
+                        print('Epoch complete in {:.0f}m {:.0f}s'.format(epoch_time_elapsed // 60, epoch_time_elapsed % 60))
+                        print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+                else:
+                    print('Epoch complete in {:.0f}m {:.0f}s'.format(epoch_time_elapsed // 60, epoch_time_elapsed % 60))
+                    print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
-                norms = [compute_gradient_norm(m) for m in self.model.classifier.children()]
-                self.grad_norms.append(norms)
-                print('Gradient norms of: classifier layers - {}, features - {}'.format(norms, compute_gradient_norm(self.model.features)))
+                # norms = [compute_gradient_norm(m) for m in self.model.classifier.children()]
+                # self.grad_norms.append(norms)
+                # print('Gradient norms of: classifier layers - {}, features - {}'.format(norms, compute_gradient_norm(self.model.features)))
 
 
                 # deep copy the model
@@ -120,8 +125,8 @@ class Trainer:
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        print('Best val Acc: {:4f}'.format(self.best_acc))
+        # print('Best val Acc: {:4f}'.format(self.best_acc))
 
         # load best model weights
-        self.model.load_state_dict(self.best_model_wts)
-        return self.model, self.val_acc_history
+        # self.model.load_state_dict(self.best_model_wts)
+        return self.model #, self.val_acc_history
