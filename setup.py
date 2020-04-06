@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='dill',  # this is the name of the package as you will import it i.e import package-name
+    name='dilltorch',  # this is the name of the package as you will import it i.e import package-name
     version=0.1,
     author='Eric Meissner',
     author_email='meissner.eric.7@gmail.com',
