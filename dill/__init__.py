@@ -1,8 +1,9 @@
 """The main module for Dill.
 """
 
-__all__ = ['anet', 'rbf', 'simple_data', 'test_functions', 'training', 'utils', 'viz']
+__all__ = ['anet', 'experiment', 'rbf', 'simple_data', 'test_functions', 'training', 'utils', 'viz']
 
+from .experiment import *
 from .rbf import *
 from .simple_data import *
 from .simple_model import *
