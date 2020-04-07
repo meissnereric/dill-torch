@@ -22,17 +22,18 @@ class Trainer:
         self.model, self.criterion, self.optimizer =  model, criterion, optimizer
 
         # Stored training metrics
-        self.val_acc_history = []
+        self.val_loss_history = []
+        self.train_loss = []
         self.best_model_wts = copy.deepcopy(self.model.state_dict())
         self.num_epochs_trained = 0
-        self.best_acc = 0.0
+        self.best_loss = 0.0
         self.grad_norms = []
         self.use_cuda = use_cuda
 
         # Version
         self.version = version
 
-    def train(self, num_epochs=25, eval_only=False, verbose=True):
+    def train(self, num_epochs=25, eval_only=False, train_only=False, verbose=True):
         """
         Function taken from Pytorch documentation, has lots of nice functionality in it.
         But I didn't write this so it has a lot.
@@ -46,8 +47,15 @@ class Trainer:
             self.num_epochs_trained = self.num_epochs_trained + 1
 
             # Each epoch has a training and validation phase
-            phases = ['val'] if eval_only else ['train', 'val']
+            if eval_only:
+                phases = ['val']
+            elif train_only:
+                phases = ['train']
+            else:
+                phases = ['train', 'val']
+
             for phase in phases:
+
                 if phase == 'train':
                     self.model.train()  # Set model to training mode
                 else:
@@ -89,7 +97,7 @@ class Trainer:
                             self.optimizer.step()
 
                             if verbose:
-                                if (i+1) % 1000 == 0:
+                                if (i+1) % 10000 == 0:
                                     print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f'
                                         %(epoch+1, num_epochs, i+1, len(train_dataset)//batch_size, loss.data))
 
@@ -102,9 +110,12 @@ class Trainer:
                 epoch_acc = running_corrects.double() / len(self.dataloaders[phase].dataset)
 
                 epoch_time_elapsed = time.time() - epoch_start_time
+                if (epoch+1) % 1000 == 0:
+                    self.train_loss.append((epoch+1, epoch_loss))
+
                 if not verbose:
-                    if (epoch+1) % 1000 == 0:
-                        print('Epoch complete in {:.0f}m {:.0f}s'.format(epoch_time_elapsed // 60, epoch_time_elapsed % 60))
+                    if (epoch+1) % 10000 == 0:
+                        print('Epoch {} complete in {:.0f}m {:.0f}s'.format(epoch+1, epoch_time_elapsed // 60, epoch_time_elapsed % 60))
                         print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
                 else:
                     print('Epoch complete in {:.0f}m {:.0f}s'.format(epoch_time_elapsed // 60, epoch_time_elapsed % 60))
@@ -116,17 +127,17 @@ class Trainer:
 
 
                 # deep copy the model
-                if phase == 'val' and epoch_acc > self.best_acc:
-                    self.best_acc = epoch_acc
+                if phase == 'val' and epoch_loss > self.best_loss:
+                    self.best_loss = epoch_loss
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
                 if phase == 'val':
-                    self.val_acc_history.append(epoch_acc)
+                    self.val_loss_history.append(epoch_loss)
 
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        # print('Best val Acc: {:4f}'.format(self.best_acc))
+        # print('Best val Loss: {:4f}'.format(self.best_loss))
 
         # load best model weights
         # self.model.load_state_dict(self.best_model_wts)
-        return self.model #, self.val_acc_history
+        return self.model

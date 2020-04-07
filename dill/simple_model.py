@@ -5,10 +5,10 @@ from .utils import constant_init, apply_init
 from .viz import plot_outputs
 
 
-def create_model(net_width):
+def create_model(net_width, sigma=0.2):
     net = nn.Sequential()
     net.add_module('basis', nn.Linear(1, net_width, bias=False))
-    net.add_module('rbf', RBF(net_width, net_width, gaussian))
+    net.add_module('rbf', RBF(net_width, net_width, gaussian, sigma=0.2))
     net.add_module('weights', nn.Linear(net_width, 1, bias=False))
     return net
 

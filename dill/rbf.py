@@ -27,20 +27,21 @@ class RBF(nn.Module):
             distances.
     """
 
-    def __init__(self, in_features, out_features, basis_func, verbose=False):
+    def __init__(self, in_features, out_features, basis_func, sigma=0.2, verbose=False, centres_range=None):
         super(RBF, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.centres = nn.Parameter(torch.Tensor(1, out_features))
-        self.sigmas = torch.Tensor(1)
+        self.sigmas = torch.Tensor([sigma])
         self.basis_func = basis_func
-        self.reset_parameters(in_features)
+        self.centres_range = (0,2*np.pi) if centres_range is None else centres_range
+        self.reset_parameters(in_features, sigma, centres_range)
         self.verbose=verbose
 
-    def reset_parameters(self, in_features):
-        rng = np.linspace(0,2*np.pi, in_features)
+    def reset_parameters(self, in_features, centres_range, sigma=0.2):
+        rng = np.linspace(centres_range[0], centres_range[1], in_features)
         self.centres.data = torch.Tensor(rng)
-        nn.init.constant_(self.sigmas, 1.)
+        nn.init.constant_(self.sigmas, sigma)
 
     def forward(self, input):
         size = (input.size(0), self.out_features)#, self.in_features)

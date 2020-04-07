@@ -10,7 +10,7 @@ def plot_outputs(outputs, final_layer=False):
     print('***************************************')
     print(outputs)
     if not final_layer:
-        for sample in outputs:
+        for sample in outputs.T:
             sample = sample.detach().numpy()
             plt.plot(sample)
     else:
