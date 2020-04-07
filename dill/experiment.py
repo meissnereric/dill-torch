@@ -55,9 +55,11 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         plt.plot(val_loss[start:pltlen,0], val_loss[start:pltlen,1], label='val loss')
         plt.legend()
         plt.savefig('losses_lr{}_netwidth{}.png'.format(lr_str, net_width))
+        plt.clf()
 
         pred, fig = visualize_predictions(net, dataloaders)
         fig.savefig('preds_lr{}_netwidth{}.png'.format(lr_str, net_width))
+        plt.clf()
     else:
         pred = make_predictions(net, dataloaders)
 
