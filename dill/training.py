@@ -4,7 +4,7 @@ import time
 import copy
 
 class Trainer:
-    def __init__(self, dataloaders, model, criterion, optimizer, mlp_width=None, mode='oo', learning_rate=1e-3,
+    def __init__(self, dataloaders, model, criterion, optimizer, scheduler=None, mlp_width=None, mode='oo', learning_rate=1e-3,
                  weight_decay=1e-2, pretrained_file=None,
                  optimizer_type=None, version=None, use_cuda=True, **kwargs):
 
@@ -20,9 +20,9 @@ class Trainer:
         self.optimizer_type = optimizer_type
 
         self.model, self.criterion, self.optimizer =  model, criterion, optimizer
-
+        self.scheduler = scheduler
         # Stored training metrics
-        self.val_loss_history = []
+        self.val_loss = []
         self.train_loss = []
         self.best_model_wts = copy.deepcopy(self.model.state_dict())
         self.num_epochs_trained = 0
@@ -106,12 +106,13 @@ class Trainer:
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(preds == labels.data)
 
+                if self.scheduler is not None:
+                    self.scheduler.step()
+
                 epoch_loss = running_loss / len(self.dataloaders[phase].dataset)
                 epoch_acc = running_corrects.double() / len(self.dataloaders[phase].dataset)
 
                 epoch_time_elapsed = time.time() - epoch_start_time
-                if (epoch+1) % 1000 == 0:
-                    self.train_loss.append((epoch+1, epoch_loss))
 
                 if not verbose:
                     if (epoch+1) % 10000 == 0:
@@ -130,8 +131,12 @@ class Trainer:
                 if phase == 'val' and epoch_loss > self.best_loss:
                     self.best_loss = epoch_loss
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
-                if phase == 'val':
-                    self.val_loss_history.append(epoch_loss)
+
+                if (epoch+1) % 1000 == 0:
+                    if phase == 'val':
+                        self.val_loss.append((epoch+1, epoch_loss))
+                    else:
+                        self.train_loss.append((epoch+1, epoch_loss))
 
 
         time_elapsed = time.time() - since

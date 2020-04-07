@@ -35,7 +35,7 @@ class RBF(nn.Module):
         self.sigmas = torch.Tensor([sigma])
         self.basis_func = basis_func
         self.centres_range = (0,2*np.pi) if centres_range is None else centres_range
-        self.reset_parameters(in_features, sigma, centres_range)
+        self.reset_parameters(in_features, self.centres_range, sigma)
         self.verbose=verbose
 
     def reset_parameters(self, in_features, centres_range, sigma=0.2):

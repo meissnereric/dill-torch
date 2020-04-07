@@ -17,7 +17,7 @@ def plot_outputs(outputs, final_layer=False):
         plt.plot(outputs.detach().numpy())
     print('***************************************')
 
-def visualize_predictions(net, dataloaders):
+def make_predictions(net, dataloaders):
     predictions = []
     for (inp, label) in dataloaders['val']:
         inputs = inp.reshape(inp.shape[0],1)
@@ -26,10 +26,13 @@ def visualize_predictions(net, dataloaders):
     predictions = np.array(predictions)
 
     print("Predictions: {}".format(predictions))
+    return predictions
 
+def visualize_predictions(net, dataloaders):
+    predictions = make_predictions(net, dataloaders)
     ax = plt.axes()
     ax.plot(predictions[0][0], predictions[0][1], label='true function')
     ax.plot(predictions[0][0], predictions[0][2], label='predictions')
     ax.legend()
 
-    return predictions
+    return predictions, plt.gcf()
