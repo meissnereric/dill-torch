@@ -48,8 +48,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     val_loss = np.array(trainer.val_loss)
     train_loss_file = 'train_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
     val_loss_file = 'val_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
-    train_loss.save(train_loss_file)
-    val_loss.save(val_loss_file)
+    np.save(train_loss_file, train_loss)
+    np.save(val_loss_file, val_loss)
     if gdrive:
         files.download(train_loss_file)
         files.download(val_loss_file)
