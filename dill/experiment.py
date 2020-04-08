@@ -11,14 +11,18 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 
+
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=30, sigma=0.2,
-                   num_epochs=1000, plot=True):
+                   num_epochs=1000, plot=True, gdrive=True):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
 
     """
+    if gdrive:
+        from google.colab import files
+
 
     train_dataset = SinDataset(train_samples)
     test_dataset = SinDataset(test_samples, noise=0.0)
@@ -42,24 +46,34 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     # Plot and save losses
     train_loss = np.array(trainer.train_loss)
     val_loss = np.array(trainer.val_loss)
-    with open('train_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width), 'w') as f:
-        f.write(str(train_loss))
-    with open('val_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width), 'w') as f:
-        f.write(str(val_loss))
+    train_loss_file = 'train_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
+    val_loss_file = 'val_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
+    train_loss.save(train_loss_file)
+    val_loss.save(val_loss_file)
+    if gdrive:
+        files.download(train_loss_file)
+        files.download(val_loss_file)
 
     if plot:
+        losses_fig_file = 'losses_lr{}_netwidth{}.png'.format(lr_str, net_width)
+        preds_fig_file = 'preds_lr{}_netwidth{}.png'.format(lr_str, net_width)
         pltlen = -1
         start=0
         plt.plot(train_loss[start:pltlen,0], [0] * len(train_loss[start:pltlen,0]), label='perfect loss')
         plt.plot(train_loss[start:pltlen,0], train_loss[start:pltlen,1], label='train loss')
         plt.plot(val_loss[start:pltlen,0], val_loss[start:pltlen,1], label='val loss')
         plt.legend()
-        plt.savefig('losses_lr{}_netwidth{}.png'.format(lr_str, net_width))
+        plt.savefig(losses_fig_file)
         plt.clf()
 
         pred, fig = visualize_predictions(net, dataloaders)
-        fig.savefig('preds_lr{}_netwidth{}.png'.format(lr_str, net_width))
+        fig.savefig(preds_fig_file)
         plt.clf()
+
+        if gdrive:
+            files.download(losses_fig_file)
+            files.download(preds_fig_file)
+
     else:
         pred = make_predictions(net, dataloaders)
 
