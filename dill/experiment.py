@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-
+gdrive_base_path = '/content/'
 
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=30, sigma=0.2,
@@ -46,13 +46,13 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     # Plot and save losses
     train_loss = np.array(trainer.train_loss)
     val_loss = np.array(trainer.val_loss)
-    train_loss_file = 'train_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
-    val_loss_file = 'val_loss_lr{}_netwidth{}.txt'.format(lr_str, net_width)
+    train_loss_file = 'train_loss_lr{}_netwidth{}'.format(lr_str, net_width)
+    val_loss_file = 'val_loss_lr{}_netwidth{}'.format(lr_str, net_width)
     np.save(train_loss_file, train_loss)
     np.save(val_loss_file, val_loss)
     if gdrive:
-        files.download(train_loss_file)
-        files.download(val_loss_file)
+        files.download(gdrive_base_path+train_loss_file+'.npy')
+        files.download(gdrive_base_path+val_loss_file+'.npy')
 
     if plot:
         losses_fig_file = 'losses_lr{}_netwidth{}.png'.format(lr_str, net_width)
@@ -71,8 +71,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         plt.clf()
 
         if gdrive:
-            files.download(losses_fig_file)
-            files.download(preds_fig_file)
+            files.download(gdrive_base_path+losses_fig_file)
+            files.download(gdrive_base_path+preds_fig_file)
 
     else:
         pred = make_predictions(net, dataloaders)
