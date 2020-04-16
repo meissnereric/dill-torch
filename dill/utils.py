@@ -26,6 +26,19 @@ def apply_init(net, name, fn):
             print(mod.weight.size())
             mod.apply(fn)
 
+def compute_layer_norm(net, layer_name='weights', norm=2):
+    """
+    Takes the norm of each parameters in a module
+    separately and returns a list of the norms.
+    """
+    norms = []
+    for name, mod in net.named_modules():
+        if name == layer_name:
+            for i in mod.parameters():
+                norms.append(i.norm(norm))
+            break
+    return norms
+
 def get_parameters(net, zero_grad=False, param_name='basis'):
     for name, mod in net.named_modules():
         if name == param_name:

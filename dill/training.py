@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import time
 import copy
+from .utils import compute_layer_norm
 
 class Trainer:
     def __init__(self, dataloaders, model, criterion, optimizer, scheduler=None, mlp_width=None, mode='oo', learning_rate=1e-3,
@@ -24,6 +25,7 @@ class Trainer:
         # Stored training metrics
         self.val_loss = []
         self.train_loss = []
+        self.weights_norms = []
         self.best_model_wts = copy.deepcopy(self.model.state_dict())
         self.num_epochs_trained = 0
         self.best_loss = 0.0
@@ -133,6 +135,7 @@ class Trainer:
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
 
                 if (epoch+1) % 1000 == 0:
+                    self.weights_norms.append(compute_layer_norm(self.model)[0])
                     if phase == 'val':
                         self.val_loss.append((epoch+1, epoch_loss))
                     else:
