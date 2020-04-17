@@ -1,5 +1,5 @@
 from .simple_data import SinDataset
-from .simple_model import create_model, init_const_model
+from .simple_model import create_model, init_normal_model
 from .training import Trainer
 from .utils import get_parameters
 from .viz import visualize_predictions, make_predictions
@@ -14,7 +14,7 @@ gdrive_base_path = '/content/'
 
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=30, sigma=0.2,
-                   num_epochs=1000, plot=True, gdrive=True):
+                   num_epochs=1000, plot=True, gdrive=True, weight_noise=0.01):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -31,7 +31,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     dataloaders = {'train': train_loader, 'val': test_loader}
 
     net = create_model(net_width, sigma=sigma)
-    init_const_model(net)
+    init_normal_model(net)
 
     original_basis_params = get_parameters(net, zero_grad=True, param_name='basis')
     original_rbf_params = get_parameters(net, zero_grad=True, param_name='rbf')

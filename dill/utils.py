@@ -3,24 +3,28 @@ import torch.nn as nn
 import torch.nn.init as init
 import numpy as np
 
-def normal_init(m):
-    if isinstance(m, nn.Linear):
-        normal_(m.weight.data, mean=0.0, std=0.1)
-        # normal_(m.bias.data, mean=0.0, std=0.1)
+def normal_init(mean=0., noise=0.01):
+    def norm_init(m):
+        if isinstance(m, nn.Linear):
+            init.normal_(m.weight.data, mean=mean, std=noise)
+    return norm_init
 
-def constant_init(m, constant=1):
-    if isinstance(m, nn.Linear):
-        init.constant_(m.weight.data, constant)
+def constant_init(constant=1):
+    def const_init(m):
+        if isinstance(m, nn.Linear):
+            init.constant_(m.weight.data, constant)
+    return const_init
         # init.constant_(m.bias.data, 1)
 
-def range_init(m, start=-3, end=3):
-    if isinstance(m, nn.Linear):
-        trange = torch.Tensor(np.linspace(start, end, num=m.weight.data.size()[0]))
-        trange = trange.reshape(m.weight.data.size())
-        m.weight.data = trange
-        # init.constant_(m.bias.data, 0)
+def range_init(start=-3, end=3):
+    def rng_init(m, start=-3, end=3):
+        if isinstance(m, nn.Linear):
+            trange = torch.Tensor(np.linspace(start, end, num=m.weight.data.size()[0]))
+            trange = trange.reshape(m.weight.data.size())
+            m.weight.data = trange
+    return rng_init
 
-def apply_init(net, name, fn):
+def apply_init(net, name, fn, **kwargs):
     for n, mod in net.named_modules():
         if n == name:
             print(mod.weight.size())
