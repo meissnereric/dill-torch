@@ -46,8 +46,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     # Plot and save losses
     train_loss = np.array(trainer.train_loss)
     val_loss = np.array(trainer.val_loss)
-    train_loss_file = 'train_loss_lr{}_netwidth{}'.format(lr_str, net_width)
-    val_loss_file = 'val_loss_lr{}_netwidth{}'.format(lr_str, net_width)
+    train_loss_file = 'train_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
+    val_loss_file = 'val_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
     np.save(train_loss_file, train_loss)
     np.save(val_loss_file, val_loss)
     if gdrive:
@@ -55,8 +55,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         files.download(gdrive_base_path+val_loss_file+'.npy')
 
     if plot:
-        losses_fig_file = 'losses_lr{}_netwidth{}.png'.format(lr_str, net_width)
-        preds_fig_file = 'preds_lr{}_netwidth{}.png'.format(lr_str, net_width)
+        losses_fig_file = 'losses_lr{}_netwidth{}_weight_noise{}.png'.format(lr_str, net_width, weight_noise)
+        preds_fig_file = 'preds_lr{}_netwidth{}_weight_noise{}.png'.format(lr_str, net_width, weight_noise)
         pltlen = -1
         start=0
         plt.plot(train_loss[start:pltlen,0], [0] * len(train_loss[start:pltlen,0]), label='perfect loss')
