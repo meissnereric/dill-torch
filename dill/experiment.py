@@ -46,10 +46,13 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     # Plot and save losses
     train_loss = np.array(trainer.train_loss)
     val_loss = np.array(trainer.val_loss)
+    weights_norms = np.array(list(map(lambda x: x.detach().numpy(), trainer.weights_norms)))
     train_loss_file = 'train_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
     val_loss_file = 'val_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
+    weights_norms_file = 'weights_norms_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
     np.save(train_loss_file, train_loss)
     np.save(val_loss_file, val_loss)
+    np.save(weights_norms_file, weights_norms)
     if gdrive:
         files.download(gdrive_base_path+train_loss_file+'.npy')
         files.download(gdrive_base_path+val_loss_file+'.npy')
