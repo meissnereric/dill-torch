@@ -20,7 +20,7 @@ def test_layer_two_outputs(data, net_width=5, sigma=0.2):
     two_layer.add_module('basis', nn.Linear(1, net_width, bias=False))
     # net.add_module('relu', nn.ReLU())
     two_layer.add_module('rbf', RBF(net_width, net_width, gaussian, sigma=sigma))
-    apply_init(two_layer, 'basis', constant_init)
+    apply_init(two_layer, 'basis', constant_init(constant=1))
     output = two_layer(data)
     plot_outputs(output)
 

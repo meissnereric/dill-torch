@@ -13,9 +13,9 @@ def create_model(net_width, sigma=0.2):
     return net
 
 def init_const_model(model):
-    apply_init(model, 'basis', constant_init)
-    apply_init(model, 'weights', constant_init)
+    apply_init(model, 'basis', constant_init(constant=1))
+    apply_init(model, 'weights', constant_init(constant=1))
 
 def init_normal_model(model, weight_noise=0.01):
-    apply_init(model, 'basis', constant_init)
+    apply_init(model, 'basis', constant_init(constant=1))
     apply_init(model, 'weights', normal_init(noise=weight_noise))
