@@ -19,7 +19,7 @@ def plot_outputs(outputs, final_layer=False, verbose=False):
     if verbose:
         print('***************************************')
 
-def make_predictions(net, dataloaders):
+def make_predictions(net, dataloaders, verbose=False):
     predictions = []
     for (inp, label) in dataloaders['val']:
         inputs = inp.reshape(inp.shape[0],1)
@@ -27,7 +27,8 @@ def make_predictions(net, dataloaders):
         predictions.append([inp.numpy(), label.numpy(), pred.detach().numpy()])
     predictions = np.array(predictions)
 
-    print("Predictions: {}".format(predictions))
+    if verbose:
+        print("Predictions: {}".format(predictions))
     return predictions
 
 def visualize_predictions(net, dataloaders):

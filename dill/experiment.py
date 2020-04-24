@@ -13,13 +13,17 @@ from torch.utils.data import DataLoader
 gdrive_base_path = '/content/'
 
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
-                   lr_str="1e4", weight_decay=0, net_width=30, sigma=0.2,
-                   num_epochs=1000, plot=True, gdrive=True, weight_noise=0.01):
+                   lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
+                   num_epochs=1000, plot=True, gdrive=True, weight_noise=0.01,
+                   seed=42):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
 
     """
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
     if gdrive:
         from google.colab import files
 
@@ -29,7 +33,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     train_loader = DataLoader(train_dataset, batch_size=train_samples)
     test_loader = DataLoader(test_dataset, batch_size=test_samples)
     dataloaders = {'train': train_loader, 'val': test_loader}
-
+    
     net = create_model(net_width, sigma=sigma)
     init_normal_model(net)
 
@@ -80,4 +84,4 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     else:
         pred = make_predictions(net, dataloaders)
 
-    return trainer, pred
+    return trainer, pred, train_dataset, test_dataset

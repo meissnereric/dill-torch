@@ -4,9 +4,13 @@ import torch.nn.init as init
 import numpy as np
 
 def normal_init(mean=0., noise=0.01):
+    """
+    Noise will be scaled by the dimensionality of the layer.
+    """
     def norm_init(m):
         if isinstance(m, nn.Linear):
-            init.normal_(m.weight.data, mean=mean, std=noise)
+            dim = m.weight.data.size()
+            init.normal_(m.weight.data, mean=mean, std=(noise / dim[1]))
     return norm_init
 
 def constant_init(constant=1):
@@ -27,7 +31,6 @@ def range_init(start=-3, end=3):
 def apply_init(net, name, fn, **kwargs):
     for n, mod in net.named_modules():
         if n == name:
-            print(mod.weight.size())
             mod.apply(fn)
 
 def compute_layer_norm(net, layer_name='weights', norm=2):
@@ -47,11 +50,8 @@ def get_parameters(net, zero_grad=False, param_name='basis'):
     for name, mod in net.named_modules():
         if name == param_name:
             params = [i for i in mod.parameters()]
-            print("mod params")
             if zero_grad:
-                print('Setting {} gradients to 0'.format(param_name))
                 mod.requires_grad = False
                 for param in params:
                     param.requires_grad = False
-            # print('basis parameters {}'.format(basis_grads))
             return params
