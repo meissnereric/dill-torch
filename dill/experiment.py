@@ -12,15 +12,19 @@ from torch.utils.data import DataLoader
 
 gdrive_base_path = '/content/'
 
+
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
                    num_epochs=1000, plot=True, gdrive=True, weight_noise=0.01,
-                   seed=42):
+                   seed=42, folder_name='exp_data/'):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
 
     """
+    import os
+    os.makedirs(folder_name, exist_ok=True)
+
     np.random.seed(seed)
     torch.manual_seed(seed)
 
@@ -33,7 +37,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     train_loader = DataLoader(train_dataset, batch_size=train_samples)
     test_loader = DataLoader(test_dataset, batch_size=test_samples)
     dataloaders = {'train': train_loader, 'val': test_loader}
-    
+
     net = create_model(net_width, sigma=sigma)
     init_normal_model(net)
 
@@ -54,9 +58,9 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     train_loss_file = 'train_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
     val_loss_file = 'val_loss_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
     weights_norms_file = 'weights_norms_lr{}_netwidth{}_weight_noise{}'.format(lr_str, net_width, weight_noise)
-    np.save(train_loss_file, train_loss)
-    np.save(val_loss_file, val_loss)
-    np.save(weights_norms_file, weights_norms)
+    np.save(folder_name + train_loss_file, train_loss)
+    np.save(folder_name + val_loss_file, val_loss)
+    np.save(folder_name + weights_norms_file, weights_norms)
     if gdrive:
         files.download(gdrive_base_path+train_loss_file+'.npy')
         files.download(gdrive_base_path+val_loss_file+'.npy')
@@ -70,11 +74,11 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         plt.plot(train_loss[start:pltlen,0], train_loss[start:pltlen,1], label='train loss')
         plt.plot(val_loss[start:pltlen,0], val_loss[start:pltlen,1], label='val loss')
         plt.legend()
-        plt.savefig(losses_fig_file)
+        plt.savefig(folder_name + losses_fig_file)
         plt.clf()
 
         pred, fig = visualize_predictions(net, dataloaders)
-        fig.savefig(preds_fig_file)
+        fig.savefig(folder_name + preds_fig_file)
         plt.clf()
 
         if gdrive:
