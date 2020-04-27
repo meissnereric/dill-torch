@@ -2,30 +2,41 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 import numpy as np
+from .rbf import RBF
 
-def normal_init(mean=0., noise=0.01):
+def normal_init(mean=0., variance=0.01):
     """
-    Noise will be scaled by the dimensionality of the layer.
+    variance will be scaled by the dimensionality of the layer.
     """
     def norm_init(m):
         if isinstance(m, nn.Linear):
             dim = m.weight.data.size()
-            init.normal_(m.weight.data, mean=mean, std=(noise / dim[1]))
+            init.normal_(m.weight.data, mean=mean, std=(variance / dim[1]))
+        if isinstance(m, RBF):
+            dim = m.centres.data.size()
+            init.normal_(m.centres.data, mean=mean, std=(variance / dim[1]))
     return norm_init
 
 def constant_init(constant=1):
     def const_init(m):
         if isinstance(m, nn.Linear):
             init.constant_(m.weight.data, constant)
+        if isinstance(m, RBF):
+            init.constant_(m.centres.data, constant)
+
     return const_init
-        # init.constant_(m.bias.data, 1)
 
 def range_init(start=-3, end=3):
-    def rng_init(m, start=-3, end=3):
+    def rng_init(m, start=start, end=end):
         if isinstance(m, nn.Linear):
             trange = torch.Tensor(np.linspace(start, end, num=m.weight.data.size()[0]))
             trange = trange.reshape(m.weight.data.size())
             m.weight.data = trange
+        if isinstance(m, RBF):
+            size=m.centres.data.size()[1]
+            trange = torch.Tensor(np.linspace(start, end, num=size))
+            trange = trange.reshape(size)
+            m.centres.data = trange
     return rng_init
 
 def apply_init(net, name, fn, **kwargs):

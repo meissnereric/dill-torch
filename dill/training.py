@@ -7,7 +7,12 @@ from .utils import compute_layer_norm
 class Trainer:
     def __init__(self, dataloaders, model, criterion, optimizer, scheduler=None, mlp_width=None, mode='oo', learning_rate=1e-3,
                  weight_decay=1e-2, pretrained_file=None,
-                 optimizer_type=None, version=None, use_cuda=True, **kwargs):
+                 optimizer_type=None, version=None, use_cuda=True,
+                 record_rate=1_000, print_rate=10_000,
+                 **kwargs):
+        """
+        :param record_rate: How often the trainer logs results (in epochs)
+        """
 
         # Dataset
         self.dataloaders = dataloaders
@@ -31,6 +36,8 @@ class Trainer:
         self.best_loss = 0.0
         self.grad_norms = []
         self.use_cuda = use_cuda
+        self.record_rate = record_rate
+        self.print_rate = print_rate
 
         # Version
         self.version = version
@@ -99,7 +106,7 @@ class Trainer:
                             self.optimizer.step()
 
                             if verbose:
-                                if (i+1) % 10000 == 0:
+                                if (i+1) % self.print_rate == 0:
                                     print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f'
                                         %(epoch+1, num_epochs, i+1, len(train_dataset)//batch_size, loss.data))
 
@@ -117,7 +124,7 @@ class Trainer:
                 epoch_time_elapsed = time.time() - epoch_start_time
 
                 if not verbose:
-                    if (epoch+1) % 10000 == 0:
+                    if (epoch+1) % self.print_rate == 0:
                         print('Epoch {} complete in {:.0f}m {:.0f}s'.format(epoch+1, epoch_time_elapsed // 60, epoch_time_elapsed % 60))
                         print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
                 else:
@@ -134,7 +141,7 @@ class Trainer:
                     self.best_loss = epoch_loss
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
 
-                if (epoch+1) % 1000 == 0:
+                if (epoch+1) % self.record_rate == 0:
                     self.weights_norms.append(compute_layer_norm(self.model)[0])
                     if phase == 'val':
                         self.val_loss.append((epoch+1, epoch_loss))
