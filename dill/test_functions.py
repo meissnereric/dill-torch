@@ -19,24 +19,23 @@ def test_layer_two_outputs(data, net_width=5, sigma=0.2):
     two_layer = nn.Sequential()
     two_layer.add_module('basis', nn.Linear(1, net_width, bias=False))
     # net.add_module('relu', nn.ReLU())
-    two_layer.add_module('rbf', RBF(net_width, net_width, gaussian, sigma=sigma))
+    two_layer.add_module('rbf0', RBF(net_width, net_width, gaussian, sigma=sigma))
     apply_init(two_layer, 'basis', constant_init(constant=1))
+    apply_init(two_layer, 'rbf0', range_init(start=0, end=2*np.pi))
     output = two_layer(data)
     plot_outputs(output)
 
-# What is the output at layer 2
 def test_rbf2_2layer_two_outputs(data, net_width=5, sigma=0.2):
     two_layer = nn.Sequential()
     two_layer.add_module('basis', nn.Linear(1, net_width, bias=False))
     # net.add_module('relu', nn.ReLU())
     two_layer.add_module('rbf0', RBF(net_width, net_width, gaussian, sigma=sigma))
     two_layer.add_module('rbf1', RBF(net_width, net_width, gaussian, sigma=sigma))
-    apply_init(model, 'basis', constant_init(constant=1))
-    apply_init(model, 'rbf0', range_init(start=0, end=2*np.pi))
-    apply_init(model, 'rbf1', range_init(start=0, end=2*np.pi))
+    apply_init(two_layer, 'basis', constant_init(constant=1))
+    apply_init(two_layer, 'rbf0', range_init(start=0, end=2*np.pi))
+    apply_init(two_layer, 'rbf1', normal_init(variance=1e-3))
     output = two_layer(data)
     plot_outputs(output)
-
 
 # What is the final output at layer 3
 def test_full_simple_model(data, net_width=5, sigma=0.2):

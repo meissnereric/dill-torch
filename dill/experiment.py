@@ -16,10 +16,10 @@ gdrive_base_path = '/content/'
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
                    hidden_layers=2, init_type='normal',
-                   num_epochs=1000, plot=True, gdrive=True, weight_variance=0.01,
+                   num_epochs=1000, plot=True, gdrive=True, weight_variance=0.001,
                    seed=42, folder_name='exp_data/',
                    record_rate=1_000, print_rate=10_000,
-                   layer_type='rbf', relu_type='softplus'):
+                   layer_type='rbf', relu_type='softplus', basis_variance=0.01):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -47,7 +47,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance)
     else:
         net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type)
-        init_relu_model(net, weight_variance=weight_variance)
+        init_relu_model(net, weight_variance=weight_variance, basis_variance=basis_variance)
 
     original_basis_params = get_parameters(net, zero_grad=True, param_name='basis')
     original_0_params = get_parameters(net, zero_grad=True, param_name='{}0'.format(layer_type))

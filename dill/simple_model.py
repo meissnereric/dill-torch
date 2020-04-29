@@ -36,8 +36,8 @@ def init_const_rbf_model(model, centres_range=None, hidden_layers=1):
     apply_init(model, 'weights', constant_init(constant=1))
 
 
-def init_relu_model(model, weight_variance=0.01):
-    apply_init(model, 'basis', constant_init(constant=1))
+def init_relu_model(model, weight_variance=0.001, basis_variance=0.01):
+    apply_init(model, 'basis', normal_init(variance=basis_variance))
     apply_init(model, 'weights', normal_init(variance=weight_variance))
 
 def init_normal_rbf_model(model, weight_variance=0.01, centres_range=None, hidden_layers=1, init_type='normal'):
