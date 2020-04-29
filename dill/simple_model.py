@@ -6,7 +6,7 @@ from .viz import plot_outputs
 import numpy as np
 
 
-def create_relu_model(net_width, hidden_layers=1, relu_type='relu'):
+def create_relu_model(net_width, hidden_layers=1, relu_type='softplus'):
     if relu_type=='relu':
         relu = nn.ReLU
     elif relu_type=='softplus':
