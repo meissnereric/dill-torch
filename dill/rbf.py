@@ -51,7 +51,7 @@ class RBF(nn.Module):
         distances = b
         return self.basis_func(distances)
 
-# RBFs
+# hidden_layers
 
 def gaussian(alpha):
     phi = torch.exp((-1/2)*alpha.pow(2))

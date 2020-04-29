@@ -1,5 +1,5 @@
 from .simple_data import SinDataset
-from .simple_model import create_model, init_normal_model
+from .simple_model import create_rbf_model, init_normal_rbf_model, create_relu_model, init_relu_model
 from .training import Trainer
 from .utils import get_parameters
 from .viz import visualize_predictions, make_predictions
@@ -15,9 +15,11 @@ gdrive_base_path = '/content/'
 
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
-                   rbfs=2, rbf_init='normal',
+                   hidden_layers=2, init_type='normal',
                    num_epochs=1000, plot=True, gdrive=True, weight_variance=0.01,
-                   seed=42, folder_name='exp_data/', record_rate=10_000):
+                   seed=42, folder_name='exp_data/',
+                   record_rate=1_000, print_rate=10_000,
+                   layer_type='rbf'):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -33,23 +35,29 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         from google.colab import files
 
 
+
     train_dataset = SinDataset(train_samples)
     test_dataset = SinDataset(test_samples, variance=0.0)
     train_loader = DataLoader(train_dataset, batch_size=train_samples)
     test_loader = DataLoader(test_dataset, batch_size=test_samples)
     dataloaders = {'train': train_loader, 'val': test_loader}
 
-    net = create_model(net_width, sigma=sigma, rbfs=rbfs)
-    init_normal_model(net, rbfs=rbfs, rbf_init=rbf_init)
+    if layer_type=='rbf':
+        net = create_rbf_model(net_width, sigma=sigma, hidden_layers=hidden_layers)
+        init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance)
+    else:
+        net = create_relu_model(net_width, hidden_layers=hidden_layers)
+        init_relu_model(net, weight_variance=weight_variance)
 
     original_basis_params = get_parameters(net, zero_grad=True, param_name='basis')
-    original_rbf0_params = get_parameters(net, zero_grad=True, param_name='rbf0')
+    original_0_params = get_parameters(net, zero_grad=True, param_name='{}0'.format(layer_type))
     original_weight_params = get_parameters(net, zero_grad=False, param_name='weights')
 
     optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate, weight_decay=weight_decay) # full batch size == GD
     criterion = nn.MSELoss()
 
-    trainer = Trainer(dataloaders=dataloaders, model=net, criterion=criterion, optimizer=optimizer)
+    trainer = Trainer(dataloaders=dataloaders, model=net, criterion=criterion, optimizer=optimizer,
+                      record_rate=record_rate, print_rate=print_rate)
 
     trainer.train(num_epochs, verbose=False)
 
