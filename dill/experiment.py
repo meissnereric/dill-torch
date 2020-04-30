@@ -19,7 +19,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    num_epochs=1000, plot=True, gdrive=True, weight_variance=0.001,
                    seed=42, folder_name='exp_data/',
                    record_rate=1_000, print_rate=10_000,
-                   layer_type='rbf', relu_type='softplus', basis_variance=0.01):
+                   layer_type='rbf', relu_type='softplus', basis_variance=0.01,
+                   net=None):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -42,12 +43,13 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     test_loader = DataLoader(test_dataset, batch_size=test_samples)
     dataloaders = {'train': train_loader, 'val': test_loader}
 
-    if layer_type=='rbf':
-        net = create_rbf_model(net_width, sigma=sigma, hidden_layers=hidden_layers)
-        init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance)
-    else:
-        net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type)
-        init_relu_model(net, weight_variance=weight_variance, basis_variance=basis_variance)
+    if net is None:
+        if layer_type=='rbf':
+            net = create_rbf_model(net_width, sigma=sigma, hidden_layers=hidden_layers)
+            init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance)
+        else:
+            net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type)
+            init_relu_model(net, weight_variance=weight_variance, basis_variance=basis_variance)
 
     original_basis_params = get_parameters(net, zero_grad=True, param_name='basis')
     original_0_params = get_parameters(net, zero_grad=True, param_name='{}0'.format(layer_type))

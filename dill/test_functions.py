@@ -37,6 +37,17 @@ def test_rbf2_2layer_two_outputs(data, net_width=5, sigma=0.2):
     output = two_layer(data)
     plot_outputs(output)
 
+def test_relu2_2layer_two_outputs(data, net_width=5, variance=0.01):
+    two_layer = nn.Sequential()
+    two_layer.add_module('basis', nn.Linear(1, net_width, bias=False))
+    # net.add_module('relu', nn.ReLU())
+    two_layer.add_module('rbf0', nn.Softplus())
+    two_layer.add_module('rbf1',nn.Softplus())
+    apply_init(two_layer, 'basis', normal_init(variance=0.01))
+
+    output = two_layer(data)
+    plot_outputs(output)
+
 # What is the final output at layer 3
 def test_full_simple_model(data, net_width=5, sigma=0.2):
     net = create_rbf_model(net_width, sigma)
