@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from .viz import plot_outputs
-from .simple_model import create_rbf_model, init_const_rbf_model
+from .simple_model import create_rbf_model
 import torch.nn.init as init
 from .rbf import RBF, gaussian
 from .utils import constant_init, apply_init, range_init, normal_init
@@ -51,6 +51,6 @@ def test_relu2_2layer_two_outputs(data, net_width=5, variance=0.01):
 # What is the final output at layer 3
 def test_full_simple_model(data, net_width=5, sigma=0.2):
     net = create_rbf_model(net_width, sigma)
-    init_const_rbf_model(net)
+    init_normal_rbf_model(net)
     outputs = net(data)
     plot_outputs(outputs, final_layer=True)

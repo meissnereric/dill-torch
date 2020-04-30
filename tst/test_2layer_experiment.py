@@ -11,6 +11,18 @@ trainer1, pred, train1, test1 = run_experiment(train_samples=30, test_samples=30
                    lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
                    num_epochs=100, plot=False, gdrive=False, weight_variance=0.01,
                    folder_name=data_folder+'/', hidden_layers=2,
-                   layer_type='rbf', init_type='normal')
+                   layer_type='rbf', init_type='normal', linear_hidden=True)
+
+trainer1, pred, train1, test1 = run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
+                  lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
+                  num_epochs=100, plot=False, gdrive=False, weight_variance=0.01,
+                  folder_name=data_folder+'/', hidden_layers=2,
+                  layer_type='rbf', init_type='normal', linear_hidden=False)
+
+trainer1, pred, train1, test1 = run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
+                  lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
+                  num_epochs=100, plot=False, gdrive=False, weight_variance=0.01,
+                  folder_name=data_folder+'/', hidden_layers=1,
+                  layer_type='rbf', init_type='normal', linear_hidden=False)
 
 shutil.rmtree(data_folder, ignore_errors=True)
