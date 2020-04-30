@@ -5,7 +5,7 @@ from .viz import plot_outputs
 from .simple_model import create_rbf_model, init_const_rbf_model
 import torch.nn.init as init
 from .rbf import RBF, gaussian
-from .utils import constant_init, apply_init
+from .utils import constant_init, apply_init, range_init, normal_init
 
 # What is the output at layer 1
 def test_layer_one_outputs(data, net_width=5):
