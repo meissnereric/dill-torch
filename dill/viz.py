@@ -2,6 +2,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import OrderedDict
 
 def plot_outputs(outputs, final_layer=False, verbose=False):
     """
@@ -39,3 +40,19 @@ def visualize_predictions(net, dataloaders):
     ax.legend()
 
     return predictions, plt.gcf()
+
+def plot_basis(net, test_tensor, title=None):
+    output = net(test_tensor)
+    plot_outputs(output)
+    plt.title(title)
+    plt.xticks(range(0, 200, 25), list(map(lambda x: "{:02.2f}".format(x), np.linspace(-1, 7, 200))))
+    plt.show()
+
+def plot_individual_output_layers(seq_net, test_tensor, save=True, folder_name='exp_data/', file_name='network_outputs.png'):
+    tmp_mods = OrderedDict()
+    for i, (name, mod) in enumerate(a.model.named_modules()):
+        if len(name) > 0:
+            tmp_mods[name] = mod
+            plot_basis(nn.Sequential(tmp_mods), test_tensor, title='Outputs at layer {}'.format(name))
+            if save:
+                plt.savefig(folder_name +  file_name + 'layer{}.png'.format(name))

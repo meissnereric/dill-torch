@@ -14,7 +14,7 @@ gdrive_base_path = '/content/'
 
 
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
-                   lr_str="1e4", weight_decay=0, net_width=15, sigma=0.2,
+                   weight_decay=0, net_width=15, sigma=0.2,
                    hidden_layers=2, init_type='normal',
                    num_epochs=1000, plot=True, gdrive=True, weight_variance=0.001,
                    seed=42, folder_name='exp_data/',
@@ -35,6 +35,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     if gdrive:
         from google.colab import files
 
+    lr_str =  str(learning_rate)
 
 
     train_dataset = SinDataset(train_samples)
