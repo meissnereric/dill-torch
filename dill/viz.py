@@ -47,7 +47,6 @@ def plot_basis(net, test_tensor, title=None):
     plot_outputs(output)
     plt.title(title)
     plt.xticks(range(0, 200, 25), list(map(lambda x: "{:02.2f}".format(x), np.linspace(-1, 7, 200))))
-    plt.show()
 
 def plot_individual_output_layers(seq_net, test_tensor, save=True, folder_name='exp_data/', file_name='network_outputs_'):
     tmp_mods = OrderedDict()
@@ -57,3 +56,4 @@ def plot_individual_output_layers(seq_net, test_tensor, save=True, folder_name='
             plot_basis(nn.Sequential(tmp_mods), test_tensor, title='Outputs at layer {}'.format(name))
             if save:
                 plt.savefig(folder_name +  file_name + 'layer{}.png'.format(name))
+            plt.show()
