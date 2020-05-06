@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
+import torch.nn as nn
 
 def plot_outputs(outputs, final_layer=False, verbose=False):
     """
@@ -48,9 +49,9 @@ def plot_basis(net, test_tensor, title=None):
     plt.xticks(range(0, 200, 25), list(map(lambda x: "{:02.2f}".format(x), np.linspace(-1, 7, 200))))
     plt.show()
 
-def plot_individual_output_layers(seq_net, test_tensor, save=True, folder_name='exp_data/', file_name='network_outputs.png'):
+def plot_individual_output_layers(seq_net, test_tensor, save=True, folder_name='exp_data/', file_name='network_outputs_'):
     tmp_mods = OrderedDict()
-    for i, (name, mod) in enumerate(a.model.named_modules()):
+    for i, (name, mod) in enumerate(seq_net.named_modules()):
         if len(name) > 0:
             tmp_mods[name] = mod
             plot_basis(nn.Sequential(tmp_mods), test_tensor, title='Outputs at layer {}'.format(name))
