@@ -143,10 +143,14 @@ class Trainer:
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
 
                 if (epoch+1) % self.record_rate == 0:
-                    try: # why do I do these things to myself
-                        norms = compute_layer_norm(self.model, layer_name='linear0')[0].detach().numpy()[None,:]
-                        norms = np.concatenate((norms, compute_layer_norm(self.model, layer_name='weights')[0].detach().numpy()[None,:]), axis=0)
-                    except:
+                    # try: # why do I do these things to myself
+                    base = compute_layer_norm(self.model, layer_name='linear0')
+                    if len(base) > 0:
+                        norms = base[0].detach().numpy()[np.newaxis][np.newaxis, :]
+                        norms = np.concatenate((norms,
+                        compute_layer_norm(self.model, layer_name='weights')[0].detach().numpy()[np.newaxis][np.newaxis, :]),
+                        axis=0)
+                    else:
                         norms = np.array(compute_layer_norm(self.model, layer_name='weights')[0].detach().numpy())
 
                     self.weights_norms.append(norms)

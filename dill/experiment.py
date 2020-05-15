@@ -69,6 +69,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     train_loss = np.array(trainer.train_loss)
     val_loss = np.array(trainer.val_loss)
     weights_norms = np.array(list(map(lambda x: x, trainer.weights_norms)))
+    print("final weights norms", weights_norms.shape)
     train_loss_file = 'train_loss_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
     val_loss_file = 'val_loss_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
     weights_norms_file = 'weights_norms_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
