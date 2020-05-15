@@ -17,8 +17,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    weight_decay=0, net_width=15, sigma=0.2,
                    hidden_layers=2, init_type='normal',
                    num_epochs=1000, plot=True, gdrive=True, weight_variance=0.001,
-                   seed=42, folder_name='exp_data/',
-                   record_rate=1_000, print_rate=10_000,
+                   seed=42, folder_name='exp_data/', record_rate=1000, print_rate=10000,
                    layer_type='rbf', relu_type='softplus', basis_variance=0.01,
                    net=None, linear_hidden=True):
     """

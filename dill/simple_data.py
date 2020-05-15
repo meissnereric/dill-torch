@@ -17,8 +17,8 @@ class NumericDataset(Dataset):
     """Dataset for generic numerical functions."""
 
     def __init__(self, samples, fn=identity, data_range=None):
-        data_range = data_range if data_range is not None else range(0,samples,1)
-        self.samples = [(i/samples, fn(i/samples)) for i in data_range]
+        self.data_range = data_range if data_range is not None else range(0,samples,1)
+        self.samples = [(i/samples, fn(i/samples)) for i in self.data_range]
 
     def __len__(self):
         return len(self.samples)
@@ -36,4 +36,5 @@ class NumericDataset(Dataset):
 
 class SinDataset(NumericDataset):
     def __init__(self, samples, variance=0.05, cycles=1.):
-        self.samples = [(i, noisy_sin(i, variance=variance)) for i in np.linspace(0,2*np.pi, samples) ]
+        self.data_range = np.linspace(0,2*np.pi, samples)
+        self.samples = [(i, noisy_sin(i, variance=variance)) for i in self.data_range]

@@ -8,7 +8,7 @@ class Trainer:
     def __init__(self, dataloaders, model, criterion, optimizer, scheduler=None, mlp_width=None, mode='oo', learning_rate=1e-3,
                  weight_decay=1e-2, pretrained_file=None,
                  optimizer_type=None, version=None, use_cuda=True,
-                 record_rate=1_000, print_rate=10_000,
+                 record_rate=1000, print_rate=10000,
                  **kwargs):
         """
         :param record_rate: How often the trainer logs results (in epochs)
@@ -142,7 +142,13 @@ class Trainer:
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
 
                 if (epoch+1) % self.record_rate == 0:
-                    self.weights_norms.append(compute_layer_norm(self.model)[0])
+                    if linear_hidden and hidden_layers > 1:
+                        norms = compute_layer_norm(self.model, layer_name='linear0')[0][None,:]
+                        norms = np.concatenate((norms, compute_layer_norm(self.model, layer_name='weights')[0][None,:]), axis=0)
+                    else:
+                        norms = np.array(compute_layer_norm(self.model, layer_name='weights')[0])
+
+                    self.weights_norms.append(norms)
                     if phase == 'val':
                         self.val_loss.append((epoch+1, epoch_loss))
                     else:
