@@ -23,16 +23,16 @@ def create_relu_model(net_width, hidden_layers=1, relu_type='softplus', linear_h
         relu = nn.Softplus
 
     net = nn.Sequential()
-    net.add_module('basis', nn.Linear(1, net_width, bias=False))
+    net.add_module('basis', nn.Linear(1, net_width, bias=True))
     for i in range(hidden_layers):
         net.add_module('relu{}'.format(i), relu())
         if linear_hidden and i < (hidden_layers-1):
-            net.add_module('linear{}'.format(i), nn.Linear(net_width, net_width, bias=False))
+            net.add_module('linear{}'.format(i), nn.Linear(net_width, net_width, bias=True))
     net.add_module('weights', nn.Linear(net_width, 1, bias=False))
     return net
 
 def init_relu_model(model, weight_variance=0.001, basis_variance=0.01, hidden_layers=1, linear_hidden=True):
-    apply_init(model, 'basis', normal_init(variance=basis_variance))
+    apply_init(model, 'basis', constant_init(constant=1))
     apply_init(model, 'weights', normal_init(variance=weight_variance))
     if linear_hidden:
         for i in range(hidden_layers - 1):

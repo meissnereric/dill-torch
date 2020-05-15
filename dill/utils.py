@@ -21,6 +21,9 @@ def constant_init(constant=1):
     def const_init(m):
         if isinstance(m, nn.Linear):
             init.constant_(m.weight.data, constant)
+            if m.bias is not None:
+                dim = m.bias.data.size()
+                init.normal_(m.bias.data, mean=0., std=(1. / dim[0]))
         if isinstance(m, RBF):
             init.constant_(m.centres.data, constant)
 
@@ -57,12 +60,13 @@ def compute_layer_norm(net, layer_name='weights', norm=2):
             break
     return norms
 
-def get_parameters(net, zero_grad=False, param_name='basis'):
-    for name, mod in net.named_modules():
-        if name == param_name:
-            params = [i for i in mod.parameters()]
+def get_parameters(net, zero_grad=False, layer_name='basis', param_name=None):
+    for mname, mod in net.named_modules():
+        if mname == layer_name:
+            params = [i for i in mod.named_parameters()]
             if zero_grad:
                 mod.requires_grad = False
-                for param in params:
-                    param.requires_grad = False
+                for pname, param in params:
+                    if param_name is None or pname == param_name:
+                        param.requires_grad = False
             return params

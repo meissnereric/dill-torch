@@ -55,7 +55,7 @@ def plot_basis(net, test_tensor, ax, title=None):
 
     return output, ax
 
-def plot_network_outputs_across_layers2(seq_net, test_tensor,
+def plot_network_outputs_across_layers(seq_net, test_tensor,
                 train_dataset, test_dataset, dataloaders,
                 save=True, folder_name='exp_data/', file_name='network_outputs_'):
     fig = plt.figure(figsize=(7, 20))
