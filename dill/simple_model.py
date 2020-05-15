@@ -27,7 +27,7 @@ def create_relu_model(net_width, hidden_layers=1, relu_type='softplus', linear_h
     for i in range(hidden_layers):
         net.add_module('relu{}'.format(i), relu())
         if linear_hidden and i < (hidden_layers-1):
-            net.add_module('linear{}'.format(i), nn.Linear(net_width, net_width, bias=True))
+            net.add_module('linear{}'.format(i), nn.Linear(net_width, net_width, bias=False))
     net.add_module('weights', nn.Linear(net_width, 1, bias=False))
     return net
 

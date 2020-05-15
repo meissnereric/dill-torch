@@ -22,7 +22,7 @@ def constant_init(constant=1):
         if isinstance(m, nn.Linear):
             init.constant_(m.weight.data, constant)
             if m.bias is not None:
-                trange = torch.Tensor(np.linspace(0, 2*np.pi, num=m.bias.data.size()[0]))
+                trange = torch.Tensor(np.linspace(-2*np.pi, 0, num=m.bias.data.size()[0]))
                 trange = trange.reshape(m.bias.data.size())
                 m.bias.data = trange
         if isinstance(m, RBF):
@@ -62,6 +62,10 @@ def compute_layer_norm(net, layer_name='weights', norm=2):
     return norms
 
 def get_parameters(net, zero_grad=False, layer_name='basis', param_name=None):
+    """
+    :param zero_grad: If True, will zero the gradients of all parameters in the requested layer.
+    :param param_name: If param_name is None, will turn off the grads of all parameters in that layer.
+    """
     for mname, mod in net.named_modules():
         if mname == layer_name:
             params = [i for i in mod.named_parameters()]

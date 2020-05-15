@@ -47,13 +47,12 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         if layer_type=='rbf':
             net = create_rbf_model(net_width, sigma=sigma, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
             init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance, linear_hidden=linear_hidden)
-            original_basis_params = get_parameters(net, zero_grad=True, layer_name='basis')
 
         else:
             net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type, linear_hidden=linear_hidden)
             init_relu_model(net, weight_variance=weight_variance, basis_variance=basis_variance, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
-            original_basis_params = get_parameters(net, zero_grad=True, layer_name='basis', param_name='weight')
 
+    original_basis_params = get_parameters(net, zero_grad=True, layer_name='basis')
     original_0_params = get_parameters(net, zero_grad=True, layer_name='{}0'.format(layer_type))
     original_weight_params = get_parameters(net, zero_grad=False, layer_name='weights')
 
