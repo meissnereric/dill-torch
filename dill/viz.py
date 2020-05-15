@@ -49,7 +49,7 @@ def plot_outputs(outputs, ax, final_layer=False):
 
 def plot_basis(net, test_tensor, ax, title=None):
     output = net(test_tensor)
-    plot_outputs(output, ax, label=label)
+    plot_outputs(output, ax)
     ax.set_title(title)
     ax.tick_params(
     axis='x',          # changes apply to the x-axis
@@ -74,7 +74,7 @@ def plot_network_outputs_across_layers(seq_net, test_tensor,
         if len(name) > 0:
             ax = fig.add_subplot(gspec[i-1, 0])
             tmp_mods[name] = mod
-            output, ax = plot_basis(nn.Sequential(tmp_mods), test_tensor, ax, title='Outputs at layer {}'.format(name), label='Outputs at layer {}'.format(name))
+            output, ax = plot_basis(nn.Sequential(tmp_mods), test_tensor, ax, title='Outputs at layer {}'.format(name))
 
     plot_dataset(train_dataset, test_dataset, ax)
 
