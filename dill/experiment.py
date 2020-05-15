@@ -100,4 +100,4 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     else:
         pred = make_predictions(net, dataloaders)
 
-    return trainer, pred, train_dataset, test_dataset
+    return trainer, pred, train_dataset, test_dataset, dataloaders
