@@ -36,20 +36,11 @@ def visualize_predictions(net, train_dataset, test_dataset, dataloaders):
 
     return predictions, plt.gcf()
 
-def plot_outputs(outputs, ax, final_layer=False):
-    """
-    Accepts a torch.Tensor and plots it.
-    """
-    if not final_layer:
-        for sample in outputs.T:
-            sample = sample.detach().numpy()
-            ax.plot(sample)
-    else:
-        ax.plot(outputs.detach().numpy())
-
 def plot_basis(net, test_tensor, ax, title=None):
     output = net(test_tensor)
-    plot_outputs(output, ax)
+    for sample in output.T:
+        sample = sample.detach().numpy()
+        ax.plot(test_tensor, sample)
     ax.set_title(title)
     ax.tick_params(
     axis='x',          # changes apply to the x-axis
@@ -58,13 +49,13 @@ def plot_basis(net, test_tensor, ax, title=None):
     top=False,         # ticks along the top edge are off
     labelbottom=True) # labels along the bottom edge are
 
-    ax.set_xticks(range(0, len(test_tensor), int(len(test_tensor) / 8.)))
-    tt = test_tensor.numpy()[0::int(len(test_tensor)/8)]
-    ax.set_xticklabels(list(map(lambda x: "{:02.2f}".format(x[0]), tt)))
+    # ax.set_xticks(range(0, len(test_tensor), int(len(test_tensor) / 8.)))
+    # tt = test_tensor.numpy()[0::int(len(test_tensor)/8)]
+    # ax.set_xticklabels(list(map(lambda x: "{:02.2f}".format(x[0]), tt)))
 
     return output, ax
 
-def plot_network_outputs_across_layers(seq_net, test_tensor,
+def plot_network_outputs_across_layers2(seq_net, test_tensor,
                 train_dataset, test_dataset, dataloaders,
                 save=True, folder_name='exp_data/', file_name='network_outputs_'):
     fig = plt.figure(figsize=(7, 20))

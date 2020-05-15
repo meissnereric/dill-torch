@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from .rbf import RBF, gaussian
 from .utils import constant_init, apply_init, normal_init, range_init
-from .viz import plot_outputs
 import numpy as np
 
 
