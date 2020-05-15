@@ -23,7 +23,7 @@ def constant_init(constant=1):
             init.constant_(m.weight.data, constant)
             if m.bias is not None:
                 dim = m.bias.data.size()
-                init.normal_(m.bias.data, mean=0., std=(1. / dim[0]))
+                init.normal_(m.bias.data, mean=0., std=(10.))
         if isinstance(m, RBF):
             init.constant_(m.centres.data, constant)
 
