@@ -3,6 +3,7 @@ import torch.nn as nn
 import time
 import copy
 from .utils import compute_layer_norm
+import numpy as np
 
 class Trainer:
     def __init__(self, dataloaders, model, criterion, optimizer, scheduler=None, mlp_width=None, mode='oo', learning_rate=1e-3,
@@ -143,10 +144,10 @@ class Trainer:
 
                 if (epoch+1) % self.record_rate == 0:
                     try: # why do I do these things to myself
-                        norms = compute_layer_norm(self.model, layer_name='linear0')[0][None,:]
-                        norms = np.concatenate((norms, compute_layer_norm(self.model, layer_name='weights')[0][None,:]), axis=0)
+                        norms = compute_layer_norm(self.model, layer_name='linear0')[0].detach().numpy()[None,:]
+                        norms = np.concatenate((norms, compute_layer_norm(self.model, layer_name='weights')[0].detach().numpy()[None,:]), axis=0)
                     except:
-                        norms = np.array(compute_layer_norm(self.model, layer_name='weights')[0])
+                        norms = np.array(compute_layer_norm(self.model, layer_name='weights')[0].detach().numpy())
 
                     self.weights_norms.append(norms)
                     if phase == 'val':
