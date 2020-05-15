@@ -22,8 +22,9 @@ def constant_init(constant=1):
         if isinstance(m, nn.Linear):
             init.constant_(m.weight.data, constant)
             if m.bias is not None:
-                dim = m.bias.data.size()
-                init.normal_(m.bias.data, mean=0., std=(10.))
+                trange = torch.Tensor(np.linspace(0, 2*np.pi, num=m.bias.data.size()[0]))
+                trange = trange.reshape(m.bias.data.size())
+                m.bias.data = trange
         if isinstance(m, RBF):
             init.constant_(m.centres.data, constant)
 
