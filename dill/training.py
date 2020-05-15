@@ -142,10 +142,10 @@ class Trainer:
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
 
                 if (epoch+1) % self.record_rate == 0:
-                    if linear_hidden and hidden_layers > 1:
+                    try: # why do I do these things to myself
                         norms = compute_layer_norm(self.model, layer_name='linear0')[0][None,:]
                         norms = np.concatenate((norms, compute_layer_norm(self.model, layer_name='weights')[0][None,:]), axis=0)
-                    else:
+                    except:
                         norms = np.array(compute_layer_norm(self.model, layer_name='weights')[0])
 
                     self.weights_norms.append(norms)
