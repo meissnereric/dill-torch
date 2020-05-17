@@ -4,17 +4,17 @@ import torch.nn.init as init
 import numpy as np
 from .rbf import RBF
 
-def normal_init(mean=0., variance=0.01):
+def normal_init(mean=0., std=0.01):
     """
-    variance will be scaled by the dimensionality of the layer.
+    std will be scaled by the dimensionality of the layer.
     """
     def norm_init(m):
         if isinstance(m, nn.Linear):
             dim = m.weight.data.size()
-            init.normal_(m.weight.data, mean=mean, std=(variance / dim[1]))
+            init.normal_(m.weight.data, mean=mean, std=(std / dim[1]))
         if isinstance(m, RBF):
             dim = m.centres.data.size()
-            init.normal_(m.centres.data, mean=mean, std=(variance / dim[1]))
+            init.normal_(m.centres.data, mean=mean, std=(std / dim[1]))
     return norm_init
 
 def constant_init(constant=1):

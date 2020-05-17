@@ -31,25 +31,25 @@ def create_relu_model(net_width, hidden_layers=1, relu_type='softplus', linear_h
     net.add_module('weights', nn.Linear(net_width, 1, bias=False))
     return net
 
-def init_relu_model(model, weight_variance=0.001, basis_variance=0.01, hidden_layers=1, linear_hidden=True):
+def init_relu_model(model, weight_std=0.001, basis_std=0.01, hidden_layers=1, linear_hidden=True):
     apply_init(model, 'basis', constant_init(constant=1))
-    apply_init(model, 'weights', normal_init(variance=weight_variance))
+    apply_init(model, 'weights', normal_init(std=weight_std))
     if linear_hidden:
         for i in range(hidden_layers - 1):
-            apply_init(model, 'linear{}'.format(i), normal_init(variance=weight_variance))
+            apply_init(model, 'linear{}'.format(i), normal_init(std=weight_std))
 
-def init_normal_rbf_model(model, weight_variance=0.01, centres_range=None, hidden_layers=1, init_type='normal', linear_hidden=True):
+def init_normal_rbf_model(model, weight_std=0.01, centres_range=None, hidden_layers=1, init_type='normal', linear_hidden=True):
     centres_range = (0,2*np.pi) if centres_range is None else centres_range
     apply_init(model, 'basis', constant_init(constant=1))
     apply_init(model, 'rbf0', range_init(start=centres_range[0], end=centres_range[1]))
     for i in range(hidden_layers - 1):
         if linear_hidden:
-            apply_init(model, 'linear{}'.format(i), normal_init(variance=weight_variance))
+            apply_init(model, 'linear{}'.format(i), normal_init(std=weight_std))
         if init_type == 'normal':
-            apply_init(model, 'rbf{}'.format(i+1), normal_init(variance=weight_variance))
+            apply_init(model, 'rbf{}'.format(i+1), normal_init(std=weight_std))
         elif init_type == 'range':
             apply_init(model, 'rbf{}'.format(i+1), range_init(start=centres_range[0], end=centres_range[1]))
         else:
             apply_init(model, 'rbf{}'.format(i+1), constant_init(constant=1))
 
-    apply_init(model, 'weights', normal_init(variance=weight_variance))
+    apply_init(model, 'weights', normal_init(std=weight_std))

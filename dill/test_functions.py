@@ -32,17 +32,17 @@
 #     two_layer.add_module('rbf1', RBF(net_width, net_width, gaussian, sigma=sigma))
 #     apply_init(two_layer, 'basis', constant_init(constant=1))
 #     apply_init(two_layer, 'rbf0', range_init(start=0, end=2*np.pi))
-#     apply_init(two_layer, 'rbf1', normal_init(variance=1e-3))
+#     apply_init(two_layer, 'rbf1', normal_init(std=1e-3))
 #     output = two_layer(data)
 #     plot_outputs(output)
 #
-# def test_relu2_2layer_two_outputs(data, net_width=5, variance=0.01):
+# def test_relu2_2layer_two_outputs(data, net_width=5, std=0.01):
 #     two_layer = nn.Sequential()
 #     two_layer.add_module('basis', nn.Linear(1, net_width, bias=False))
 #     # net.add_module('relu', nn.ReLU())
 #     two_layer.add_module('rbf0', nn.Softplus())
 #     two_layer.add_module('rbf1',nn.Softplus())
-#     apply_init(two_layer, 'basis', normal_init(variance=0.01))
+#     apply_init(two_layer, 'basis', normal_init(std=0.01))
 #
 #     output = two_layer(data)
 #     plot_outputs(output)

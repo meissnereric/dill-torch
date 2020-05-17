@@ -7,8 +7,8 @@ import numpy as np
 def identity(x):
     return x
 
-def noisy_sin(x, variance=0.05):
-    return np.sin(x, dtype=np.float64) + np.random.normal(0,variance)
+def noisy_sin(x, std=0.05):
+    return np.sin(x, dtype=np.float64) + np.random.normal(0,std)
 
 def linear(x, scale=0.1):
     return x * scale
@@ -35,6 +35,6 @@ class NumericDataset(Dataset):
         W = cov ** (-1/2)
 
 class SinDataset(NumericDataset):
-    def __init__(self, samples, variance=0.05, cycles=1.):
+    def __init__(self, samples, std=0.05, cycles=1.):
         self.data_range = np.linspace(0,2*np.pi, samples)
-        self.samples = [(i, noisy_sin(i, variance=variance)) for i in self.data_range]
+        self.samples = [(i, noisy_sin(i, std=std)) for i in self.data_range]

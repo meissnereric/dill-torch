@@ -16,9 +16,9 @@ gdrive_base_path = '/content/'
 def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    weight_decay=0, net_width=15, sigma=0.2,
                    hidden_layers=2, init_type='normal',
-                   num_epochs=1000, plot=True, gdrive=True, weight_variance=0.001,
+                   num_epochs=1000, plot=True, gdrive=True, weight_std=0.001,
                    seed=42, folder_name='exp_data/', record_rate=1000, print_rate=10000,
-                   layer_type='rbf', relu_type='softplus', basis_variance=0.01,
+                   layer_type='rbf', relu_type='softplus', basis_std=0.01,
                    net=None, linear_hidden=True):
     """
     Experimental code to test for double dip phenomenon.
@@ -38,7 +38,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
 
 
     train_dataset = SinDataset(train_samples)
-    test_dataset = SinDataset(test_samples, variance=0.0)
+    test_dataset = SinDataset(test_samples, std=0.0)
     train_loader = DataLoader(train_dataset, batch_size=train_samples)
     test_loader = DataLoader(test_dataset, batch_size=test_samples)
     dataloaders = {'train': train_loader, 'val': test_loader}
@@ -46,11 +46,11 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     if net is None:
         if layer_type=='rbf':
             net = create_rbf_model(net_width, sigma=sigma, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
-            init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_variance=weight_variance, linear_hidden=linear_hidden)
+            init_normal_rbf_model(net, hidden_layers=hidden_layers, init_type=init_type, weight_std=weight_std, linear_hidden=linear_hidden)
 
         else:
             net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type, linear_hidden=linear_hidden)
-            init_relu_model(net, weight_variance=weight_variance, basis_variance=basis_variance, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
+            init_relu_model(net, weight_std=weight_std, basis_std=basis_std, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
 
     original_basis_params = get_parameters(net, zero_grad=True, layer_name='basis')
     original_0_params = get_parameters(net, zero_grad=True, layer_name='{}0'.format(layer_type))
@@ -69,9 +69,9 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
     val_loss = np.array(trainer.val_loss)
     weights_norms = np.array(list(map(lambda x: x, trainer.weights_norms)))
     print("final weights norms", weights_norms.shape)
-    train_loss_file = 'train_loss_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
-    val_loss_file = 'val_loss_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
-    weights_norms_file = 'weights_norms_lr{}_netwidth{}_weight_variance{}'.format(lr_str, net_width, weight_variance)
+    train_loss_file = 'train_loss_lr{}_netwidth{}_weight_std{}'.format(lr_str, net_width, weight_std)
+    val_loss_file = 'val_loss_lr{}_netwidth{}_weight_std{}'.format(lr_str, net_width, weight_std)
+    weights_norms_file = 'weights_norms_lr{}_netwidth{}_weight_std{}'.format(lr_str, net_width, weight_std)
     np.save(folder_name + train_loss_file, train_loss)
     np.save(folder_name + val_loss_file, val_loss)
     np.save(folder_name + weights_norms_file, weights_norms)
@@ -80,8 +80,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
         files.download(gdrive_base_path+val_loss_file+'.npy')
 
     if plot:
-        losses_fig_file = 'losses_lr{}_netwidth{}_weight_variance{}.png'.format(lr_str, net_width, weight_variance)
-        preds_fig_file = 'preds_lr{}_netwidth{}_weight_variance{}.png'.format(lr_str, net_width, weight_variance)
+        losses_fig_file = 'losses_lr{}_netwidth{}_weight_std{}.png'.format(lr_str, net_width, weight_std)
+        preds_fig_file = 'preds_lr{}_netwidth{}_weight_std{}.png'.format(lr_str, net_width, weight_std)
         pltlen = -1
         start=0
         plt.plot(train_loss[start:pltlen,0], [0] * len(train_loss[start:pltlen,0]), label='perfect loss')
