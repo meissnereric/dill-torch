@@ -19,7 +19,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    num_epochs=1000, plot=True, gdrive=True, weight_std=0.001,
                    seed=42, folder_name='exp_data/', record_rate=1000, print_rate=10000,
                    layer_type='rbf', relu_type='softplus', basis_std=0.01,
-                   net=None, linear_hidden=True):
+                   net=None, linear_hidden=True,
+                   dataloaders=None):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -36,12 +37,15 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
 
     lr_str =  str(learning_rate)
 
-
-    train_dataset = SinDataset(train_samples)
-    test_dataset = SinDataset(test_samples, std=0.0)
-    train_loader = DataLoader(train_dataset, batch_size=train_samples)
-    test_loader = DataLoader(test_dataset, batch_size=test_samples)
-    dataloaders = {'train': train_loader, 'val': test_loader}
+    if dataloaders is None:
+        train_dataset = SinDataset(train_samples)
+        test_dataset = SinDataset(test_samples, std=0.0)
+        train_loader = DataLoader(train_dataset, batch_size=train_samples)
+        test_loader = DataLoader(test_dataset, batch_size=test_samples)
+        dataloaders = {'train': train_loader, 'val': test_loader}
+    else:
+        train_dataset = None
+        test_dataset = None
 
     if net is None:
         if layer_type=='rbf':
