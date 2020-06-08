@@ -20,7 +20,7 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
                    seed=42, folder_name='exp_data/', record_rate=1000, print_rate=10000,
                    layer_type='rbf', relu_type='softplus', basis_std=0.01,
                    net=None, linear_hidden=True,
-                   dataloaders=None):
+                   dataloaders=None, fix_basis=True):
     """
     Experimental code to test for double dip phenomenon.
     Batch size is always the full dataset so SGD == GD.
@@ -56,8 +56,8 @@ def run_experiment(train_samples=30, test_samples=300, learning_rate=1e-4,
             net = create_relu_model(net_width, hidden_layers=hidden_layers, relu_type=relu_type, linear_hidden=linear_hidden)
             init_relu_model(net, weight_std=weight_std, basis_std=basis_std, hidden_layers=hidden_layers, linear_hidden=linear_hidden)
 
-    original_basis_params = get_parameters(net, zero_grad=True, layer_name='basis')
-    original_0_params = get_parameters(net, zero_grad=True, layer_name='{}0'.format(layer_type))
+    original_basis_params = get_parameters(net, zero_grad=fix_basis, layer_name='basis')
+    original_0_params = get_parameters(net, zero_grad=fix_basis, layer_name='{}0'.format(layer_type))
     original_weight_params = get_parameters(net, zero_grad=False, layer_name='weights')
 
     optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate, weight_decay=weight_decay) # full batch size == GD
