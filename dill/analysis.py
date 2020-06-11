@@ -6,6 +6,11 @@ import torch
 import torch.nn as nn
 import pickle
 
+def save_params(obj, name):
+    with open(name, 'wb') as f:
+        pickle.dump(obj, f)
+
+
 class ExpResults:
     def __init__(self, network_type, basepath='/content/'):
         self.basepath = basepath
